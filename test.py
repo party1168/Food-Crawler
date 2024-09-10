@@ -1,7 +1,12 @@
-import requests
-from bs4 import BeautifulSoup
+# test_import.py
+try:
+    from utils.http_utils import make_request
+    print("Successfully imported make_request from utils.http_utils")
+except ImportError as e:
+    print(f"Import failed: {e}")
 
-url = "https://tastyoven.com/air-fryer/"
-response = requests.get(url)
-soup = BeautifulSoup(response.text, 'html.parser')
-print(soup.title)
+try:
+    from TastyOven_scraper import TastyOvenScraper
+    print("Successfully imported TastyOvenScraper")
+except ImportError as e:
+    print(f"Import failed: {e}")
