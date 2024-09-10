@@ -4,14 +4,21 @@ import re
 import csv
 import json
 
+def make_request(url):
+    headers = {
+         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    try:
+        response = requests.get(url,headers=headers)
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
+        print(f"請求錯誤: {e}")
+
 def get_recipe_categories(url):
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url,headers=headers)
-        response.raise_for_status()  # 移到這裡
-        soup = BeautifulSoup(response.text, 'html.parser')
+        response_text = make_request(url)
+        soup = BeautifulSoup(response_text, 'html.parser')
         
         categories = []
         categories_containers = soup.find_all('ul', class_="feast-category-index-list")
@@ -45,9 +52,6 @@ def get_recipe_categories(url):
         print(f"發生錯誤: {e}")
         return []
 def get_recipe_names(category_name,category_url):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
 
     recipes = {}  # 使用字典而不是列表
     page = 1
@@ -60,9 +64,8 @@ def get_recipe_names(category_name,category_url):
         
         try:
             print(f"正在處理第 {page} 頁")
-            response = requests.get(current_url, headers=headers)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
+            response_text = make_request(category_url)
+            soup = BeautifulSoup(response_text, 'html.parser')
 
             recipe_items = soup.find_all('li', class_="listing-item")
             if not recipe_items:
@@ -108,7 +111,7 @@ def is_likely_ingredient(text):
     ingredient_keywords = ['cheese', 'sauce', 'dough', 'meat', 'vegetable', 'fruit', 'spice', 'herb', 'oil', 'flour', 'sugar', 'salt']
     
     # 定義不太可能是食材的關鍵詞
-    non_ingredient_keywords = ['Time-saving','oven','box','bag','machine','air fryer', 'basket', 'recipe', 'brush', 'assemble', 'remove', 'change', 'use']
+    non_ingredient_keywords = ['add','Time-saving','oven','box','bag','machine','air fryer', 'basket', 'recipe', 'brush', 'assemble', 'remove', 'change', 'use']
     
     # 檢查文本是否包含食材關鍵詞
     if any(keyword in text.lower() for keyword in ingredient_keywords):
@@ -128,14 +131,9 @@ def is_likely_ingredient(text):
     
     return False
 def get_recipe_detail(recipe_url):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-
     try:
-        response = requests.get(recipe_url,headers=headers)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text,'html.parser')
+        response_text = make_request(recipe_url)
+        soup = BeautifulSoup(response_text,'html.parser')
 
         title = soup.find('h1', class_='entry-title')
         title = title.text.strip() if title else "標題未找到"
@@ -179,9 +177,22 @@ def get_recipe_detail(recipe_url):
         'url':recipe_url
     }
 def save_to_csv(data,filename):
-    pass
+    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['recipe_name', 'ingredients', 'url']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        
+        writer.writeheader()
+        for recipe in data:
+            writer.writerow({
+                'recipe_name': recipe['recipe_name'],
+                'ingredients': ', '.join(recipe['ingredients']),
+                'url': recipe['url']
+            })
+    print(f"已保存到 {filename}")
 def save_to_json(data,filename):
-    pass
+    with open(filename, 'w', encoding='utf-8') as jsonfile:
+        json.dump(data, jsonfile, ensure_ascii=False, indent=4)
+    print(f"已保存到 {filename}")
 def main():
     base_url = "https://tastyoven.com/quick-and-tasty-recipes-for-busy-families-2/"
 
@@ -196,15 +207,17 @@ def main():
         pass
     pass
     for index, recipe in enumerate(all_recipes, 1):
-        print(f"\n--- 食譜 {index} ---")
-        print(f"名稱: {recipe['recipe_name']}")
+        print(f"\n--- Recipe {index} ---")
+        print(f"Name: {recipe['recipe_name']}")
         print(f"URL: {recipe['url']}")
-        print("食材:")
+        print("Ingredients:")
         for ingredient in recipe['ingredients']:
             print(f"  - {ingredient}")
         print("-" * 30)
 
-    print(f"\n總共爬取了 {len(all_recipes)} 個食譜")
+    print(f"\nTotal {len(all_recipes)} recipes")
+
+    save_to_csv(all_recipes,'recipes.csv')
 pass
 
 if __name__ == "__main__":
