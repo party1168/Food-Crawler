@@ -1,6 +1,7 @@
 # scrapers/tasty_oven_scraper.py
 import re
 from scrapers.base_scraper import BaseScraper
+from tqdm import tqdm
 from utils.http_utils import make_request
 from utils.data_utils import parse_html, extract_data_from_soup, is_likely_ingredient
 
@@ -111,12 +112,4 @@ class TastyOvenScraper(BaseScraper):
         }
 
     def scrape_all_recipes(self):
-        all_recipes = []
-        categories = self.get_recipe_categories()
-        for category in categories:
-            recipes = self.get_recipe_names(category['url'])
-            for recipe in recipes:
-                details = self.get_recipe_detail(recipe['url'])
-                if details:
-                    all_recipes.append(details)
-        return all_recipes
+        return super().scrape_all_recipes()

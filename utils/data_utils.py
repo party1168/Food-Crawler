@@ -12,10 +12,11 @@ def extract_data_from_soup(soup, selector, attribute=None):
         return [elem.get(attribute) for elem in elements if elem.has_attr(attribute)]
     return [elem.text.strip() for elem in elements]
 
-def save_to_csv(data, filename, fieldnames):
-    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+def save_to_csv(data, filename, fieldnames,mode ='a'):
+    with open(filename,mode, newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+        if mode == 'w':
+            writer.writeheader()
         for item in data:
             writer.writerow(item)
     print(f"數據已保存到 {filename}")
