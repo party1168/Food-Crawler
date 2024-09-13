@@ -2,13 +2,15 @@
 from tqdm import tqdm
 from scrapers.africanbites_scraper import AfricanBitesScraper
 from scrapers.tastyoven_scraper import TastyOvenScraper
+from scrapers.thecookingcollective_scraper import TheCookingCollectiveScraper
 from utils.data_utils import save_to_csv, save_to_json
 
 def main():
     scrapers = [
         TastyOvenScraper("https://tastyoven.com/quick-and-tasty-recipes-for-busy-families-2/"),
         # 在這裡添加其他網站的爬蟲實例
-        AfricanBitesScraper('https://www.africanbites.com/category/collections/')
+        AfricanBitesScraper('https://www.africanbites.com/category/collections/'),
+        TheCookingCollectiveScraper('https://www.thecookingcollective.com.au/recipes/')
     ]
     fieldname = ['recipe_name','ingredients','url']
     filename = 'recipes.csv'

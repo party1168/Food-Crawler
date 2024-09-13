@@ -1,5 +1,5 @@
 import test_setup
-from scrapers.africanbites_scraper import AfricanBitesScraper
+from scrapers.thecookingcollective_scraper import TheCookingCollectiveScraper
 
 def test_get_categories(scraper):
     recipes_categories= scraper.get_recipe_categories()
@@ -15,19 +15,20 @@ def test_get_names(scraper):
             print(f"Recipe Title:{recipe['name']}")
             print(f"Recipe URL:{recipe['url']}")
             print("---")
-def test_scrape_all_recipes(scraper):
+def test_scraper_all_recipes(scraper):
     recipes = scraper.scrape_all_recipes()
     for index, recipe in enumerate(recipes, 1):
         print(f"\n--- Recipe {index} ---")
-        print(f"Name: {recipe['name']}")
+        print(f"Name: {recipe['recipe_name']}")
         print(f"URL: {recipe['url']}")
         print("Ingredients:")
         for ingredient in recipe['ingredients']:
             print(f"  - {ingredient}")
         print("-" * 30)    
 def main():
-    scraper = AfricanBitesScraper('https://www.africanbites.com/category/collections/')
+    scraper = TheCookingCollectiveScraper('https://www.thecookingcollective.com.au/recipes/')
     #test_get_categories(scraper)
-    test_get_names(scraper)
+    #test_get_names(scraper)
+    test_scraper_all_recipes(scraper)
 if __name__ == "__main__":
     main()

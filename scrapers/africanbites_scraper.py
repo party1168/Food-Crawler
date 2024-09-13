@@ -98,5 +98,4 @@ class AfricanBitesScraper(BaseScraper):
             }
 
     def scrape_all_recipes(self):
-        print()
         return super().scrape_all_recipes()
