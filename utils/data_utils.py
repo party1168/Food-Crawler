@@ -3,6 +3,23 @@ import csv
 import json
 import re
 
+fraction_map = {
+    '½': '.5',
+    '¼': '.25',
+    '¾': '.75',
+    '⅓': '.33',
+    '⅔': '.67',
+    '⅕': '.2',
+    '⅖': '.4',
+    '⅗': '.6',
+    '⅘': '.8',
+    '⅙': '.17',
+    '⅚': '.83',
+    '⅛': '.125',
+    '⅜': '.375',
+    '⅝': '.625',
+    '⅞': '.875'
+}
 def parse_html(html_content, parser='html.parser'):
     return BeautifulSoup(html_content, parser)
 
@@ -36,11 +53,15 @@ def clean_and_validate_ingredient(ingredient_text,
                                   excluded_words=['privacy', 'contact', 'sign up', 'policy'],
                                   time_pattern=r'\d+\s*(minutes|hours|mins|hrs)',
                                   exclusion_pattern=r'(just|always|for|instead of|such as|like)'):
-        # 清理文本
+    # 清理文本
     ingredient_text = re.sub(r'http\S+', '', ingredient_text)
     ingredient_text = re.sub(r'\(.*?\)', '', ingredient_text)
     ingredient_text = re.sub(r'\s+', ' ', ingredient_text).strip()
     
+    # 替換分數符號
+    for fraction, decimal in fraction_map.items():
+        ingredient_text = ingredient_text.replace(fraction, decimal)
+
     # 驗證條件
     if (len(ingredient_text) < max_length and
         not any(word in ingredient_text.lower() for word in excluded_words) and
