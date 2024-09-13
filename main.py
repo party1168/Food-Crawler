@@ -12,7 +12,6 @@ def main():
     ]
     fieldname = ['recipe_name','ingredients','url']
     filename = 'recipes.csv'
-    batch_size = 500
     all_recipes = []
     for scraper in tqdm(scrapers,desc="爬取網站進度",unit="scraper"):
         print(f"正在爬取 {scraper.__class__.__name__}")

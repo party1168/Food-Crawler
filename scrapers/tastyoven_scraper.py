@@ -101,7 +101,7 @@ class TastyOvenScraper(BaseScraper):
                 if (len(ingredient_text) < 50 and
                     not any(word in ingredient_text.lower() for word in ['privacy', 'contact', 'sign up', 'policy']) and
                     not re.search(r'\d+\s*(minutes|hours|mins|hrs)', ingredient_text, re.I) and
-                    not re.search(r'(always|for|instead of|such as|like)', ingredient_text, re.I)):
+                    not re.search(r'(just|always|for|instead of|such as|like)', ingredient_text, re.I)):
                     if is_likely_ingredient(ingredient_text, self.ingredient_keywords, self.non_ingredient_keywords):
                         ingredients.append(ingredient_text)
 

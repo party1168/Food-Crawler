@@ -12,14 +12,14 @@ def test_get_names(scraper):
     for recieps_category in recipes_categories:
         recipes = scraper.get_recipe_names(recieps_category['url'])
         for recipe in recipes:
-            print(f"Recipe Title:{recipe['name']}")
+            print(f"Recipe Title:{recipe['recipe_name']}")
             print(f"Recipe URL:{recipe['url']}")
             print("---")
 def test_scrape_all_recipes(scraper):
     recipes = scraper.scrape_all_recipes()
     for index, recipe in enumerate(recipes, 1):
         print(f"\n--- Recipe {index} ---")
-        print(f"Name: {recipe['title']}")
+        print(f"Name: {recipe['recipe_name']}")
         print(f"URL: {recipe['url']}")
         print("Ingredients:")
         for ingredient in recipe['ingredients']:

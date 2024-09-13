@@ -1,7 +1,7 @@
 from scrapers.base_scraper import BaseScraper
 import re
 from utils.http_utils import make_request
-from utils.data_utils import parse_html, extract_data_from_soup, is_likely_ingredient
+from utils.data_utils import parse_html, extract_data_from_soup, clean_and_validate_ingredient
 
 class AfricanBitesScraper(BaseScraper):
 
@@ -34,7 +34,6 @@ class AfricanBitesScraper(BaseScraper):
         if not categories:
             print("Categories not found")
         return categories
-    
     def get_recipe_names(self, category_url):
         page = 1
         recipes = {}
@@ -80,26 +79,24 @@ class AfricanBitesScraper(BaseScraper):
             return []
         ingredient_items = ingredient_container.find_all('li')
         for ingredient_item in ingredient_items:
-            ingredient_strong = ingredient_item.find('mark',class_="has-orange-color")
-            if ingredient_strong:
-                ingredient_text = ingredient_strong.text.strip()
-            else:
-                ingredient_text = ingredient_item.text.strip()
-            ingredient_text = re.sub(r'http\S+', '', ingredient_text)
-            ingredient_text = re.sub(r'\(.*?\)', '', ingredient_text)
-            ingredient_text = re.sub(r'\s+', ' ', ingredient_text).strip()
-                
-            if (len(ingredient_text) < 50 and
-                not any(word in ingredient_text.lower() for word in ['privacy', 'contact', 'sign up', 'policy']) and
-                not re.search(r'\d+\s*(minutes|hours|mins|hrs)', ingredient_text, re.I) and
-                not re.search(r'(always|for|instead of|such as|like)', ingredient_text, re.I)):
-                if is_likely_ingredient(ingredient_text, self.ingredient_keywords, self.non_ingredient_keywords):
-                    ingredients.append(ingredient_text)
-        return {
-            'recipe_name':recipe_title,
-            'ingredients':ingredients,
-            'url':recipe_url
-        }
+            ingredient_text = ""
+            strong = ingredient_item.find('strong')
+            if strong:
+                ingredient_text = strong.text.strip()
+
+            mark = ingredient_item.find('mark',class_="has-orange-color")
+            if mark:
+                ingredient_text = mark.text.strip()
+            pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
+            if pass_ingredient:
+                ingredients.append(pass_ingredient)
+        if ingredients:
+            return {
+                'recipe_name':recipe_title,
+                'ingredients':ingredients,
+                'url':recipe_url
+            }
 
     def scrape_all_recipes(self):
+        print()
         return super().scrape_all_recipes()

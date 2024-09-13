@@ -29,6 +29,29 @@ def save_to_json(data, filename):
 def get_pagination_urls(base_url, max_pages):
     return [f"{base_url}page/{page}/" if page > 1 else base_url for page in range(1, max_pages + 1)]
 
+def clean_and_validate_ingredient(ingredient_text,
+                                  ingredient_keywords,
+                                  non_ingredient_keywords,
+                                  max_length=50,
+                                  excluded_words=['privacy', 'contact', 'sign up', 'policy'],
+                                  time_pattern=r'\d+\s*(minutes|hours|mins|hrs)',
+                                  exclusion_pattern=r'(just|always|for|instead of|such as|like)'):
+        # 清理文本
+    ingredient_text = re.sub(r'http\S+', '', ingredient_text)
+    ingredient_text = re.sub(r'\(.*?\)', '', ingredient_text)
+    ingredient_text = re.sub(r'\s+', ' ', ingredient_text).strip()
+    
+    # 驗證條件
+    if (len(ingredient_text) < max_length and
+        not any(word in ingredient_text.lower() for word in excluded_words) and
+        not re.search(time_pattern, ingredient_text, re.I) and
+        not re.search(exclusion_pattern, ingredient_text, re.I)):
+        
+        if is_likely_ingredient(ingredient_text, ingredient_keywords, non_ingredient_keywords):
+            return ingredient_text
+    
+    return None
+
 def is_likely_ingredient(text, ingredient_keywords, non_ingredient_keywords):
     text_lower = text.lower()
     if any(keyword in text_lower for keyword in ingredient_keywords):
