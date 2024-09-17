@@ -5,6 +5,7 @@ from scrapers.africanbites_scraper import AfricanBitesScraper
 from scrapers.tastyoven_scraper import TastyOvenScraper
 from scrapers.thecookingcollective_scraper import TheCookingCollectiveScraper
 from scrapers.feelgoodfoodie_scraper import FeelGoodFoodieScraper
+from scrapers.bellyfull_scraper import BellyFullScraper
 from utils.data_utils import save_to_csv, save_to_json
 
 def scrap_website(scraper):
@@ -17,12 +18,13 @@ def main():
         # 在這裡添加其他網站的爬蟲實例
         AfricanBitesScraper('https://www.africanbites.com/category/collections/'),
         TheCookingCollectiveScraper('https://www.thecookingcollective.com.au/recipes/'),
-        FeelGoodFoodieScraper('https://feelgoodfoodie.net/recipe/')
+        FeelGoodFoodieScraper('https://feelgoodfoodie.net/recipe/'),
+        BellyFullScraper('https://bellyfull.net/recipe-index/')
     ]
     fieldname = ['recipe_name','ingredients','url']
     filename = 'recipes.csv'
     all_recipes = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers)) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers)+1) as executor:
         future_to_scraper = {executor.submit(scrap_website,scraper): scraper for scraper in scrapers}
         for future in tqdm(concurrent.futures.as_completed(future_to_scraper),total=len(scrapers),desc="Scrape Website Progress",unit="website"):
             scraper = future_to_scraper[future]
