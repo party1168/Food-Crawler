@@ -3,13 +3,13 @@ import re
 from scrapers.base_scraper import BaseScraper
 from tqdm import tqdm
 from utils.http_utils import make_request
-from utils.data_utils import parse_html, extract_data_from_soup, is_likely_ingredient
+from utils.data_utils import parse_html, clean_and_validate_ingredient
 
 class TastyOvenScraper(BaseScraper):
     def __init__(self, base_url):
         super().__init__(base_url)
         self.ingredient_keywords = ['cheese', 'sauce', 'dough', 'meat', 'vegetable', 'fruit', 'spice', 'herb', 'oil', 'flour', 'sugar', 'salt']
-        self.non_ingredient_keywords = ['Add', 'Time-saving', 'oven', 'box', 'bag', 'machine', 'air fryer', 'basket', 'recipe', 'brush', 'assemble', 'remove', 'change', 'use']
+        self.non_ingredient_keywords = ['Time-saving', 'oven', 'box', 'bag', 'machine', 'air fryer', 'basket', 'recipe', 'brush', 'assemble', 'remove', 'change', 'use']
 
     def get_recipe_categories(self):
         response_text = make_request(self.base_url)
@@ -87,29 +87,35 @@ class TastyOvenScraper(BaseScraper):
         title = title.text.strip() if title else "標題未找到"
 
         ingredients = []
-        ingredient_sections = soup.find_all('ul', class_="wp-block-list")
+        ingredient_sections = soup.find_all('div',class_='wprm-recipe-ingredient-group') 
+        if not ingredient_sections:
+            return None 
         for ingredient_section in ingredient_sections:
-            lis = ingredient_section.find_all('li')
+            ingredient_container = ingredient_section.find('ul',class_="wprm-recipe-ingredients")
+            lis = ingredient_container.find_all('li',class_="wprm-recipe-ingredient")
             for li in lis:
-                ingredient = li.find('strong')
-                ingredient_text = ingredient.text.strip() if ingredient else li.get_text(strip=True)
-                ingredient_text = ingredient_text.split(',')[0].split(':')[0].strip()
-                ingredient_text = re.sub(r'http\S+', '', ingredient_text)
-                ingredient_text = re.sub(r'\(.*?\)', '', ingredient_text)
-                ingredient_text = re.sub(r'\s+', ' ', ingredient_text).strip()
-                
-                if (len(ingredient_text) < 50 and
-                    not any(word in ingredient_text.lower() for word in ['privacy', 'contact', 'sign up', 'policy']) and
-                    not re.search(r'\d+\s*(minutes|hours|mins|hrs)', ingredient_text, re.I) and
-                    not re.search(r'(just|always|for|instead of|such as|like)', ingredient_text, re.I)):
-                    if is_likely_ingredient(ingredient_text, self.ingredient_keywords, self.non_ingredient_keywords):
-                        ingredients.append(ingredient_text)
-
-        return {
+                ingredient_amount_item = li.find('span',class_="wprm-recipe-ingredient-amount")
+                if ingredient_amount_item:
+                    ingredient_amount = ingredient_amount_item.text.strip()
+                else:
+                    ingredient_amount =""
+                ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
+                if ingredient_unit_item:
+                    ingredient_unit = ingredient_unit_item.text.strip()
+                else:
+                    ingredient_unit = ""
+                ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
+                ingredient_text = ingredient_amount + ingredient_unit + ingredient_name
+                ingredient_text = ingredient_text.strip()
+                pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
+                if pass_ingredient:
+                    ingredients.append(pass_ingredient)
+        if ingredients:
+            return {
             'recipe_name': title,
             'ingredients': ingredients,
             'url': recipe_url
-        }
+            }
 
     def scrape_all_recipes(self):
         return super().scrape_all_recipes()

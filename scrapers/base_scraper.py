@@ -27,7 +27,7 @@ class BaseScraper(ABC):
         categories = self.get_recipe_categories()
         for category in tqdm(categories,desc="食譜種類進度",unit="category"):
             recipes = self.get_recipe_names(category['url'])
-            for recipe in tqdm(recipes,desc="爬取食譜進度",unit="recipes"):
+            for recipe in recipes:
                 details = self.get_recipe_detail(recipe['url'])
                 if details and details['ingredients']:
                     all_recipes.append(details)

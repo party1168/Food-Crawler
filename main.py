@@ -42,6 +42,7 @@ def main():
             except Exception as e:
                 print(f"{scraper.__class__.__name__} generated an exception: {e}")
         # 保存結果
+    
     save_to_csv(all_recipes, filename=filename,fieldnames=fieldname,mode="w")
 
 if __name__ == "__main__":
