@@ -6,6 +6,7 @@ from scrapers.tastyoven_scraper import TastyOvenScraper
 from scrapers.thecookingcollective_scraper import TheCookingCollectiveScraper
 from scrapers.feelgoodfoodie_scraper import FeelGoodFoodieScraper
 from scrapers.bellyfull_scraper import BellyFullScraper
+from scrapers.feastingathome_scraper import FeastingAtHomeScraper
 from utils.data_utils import save_to_csv, save_to_json
 
 def scrape_website(scraper,pbar):
@@ -20,7 +21,9 @@ def main():
         AfricanBitesScraper('https://www.africanbites.com/category/collections/'),
         TheCookingCollectiveScraper('https://www.thecookingcollective.com.au/recipes/'),
         FeelGoodFoodieScraper('https://feelgoodfoodie.net/recipe/'),
-        BellyFullScraper('https://bellyfull.net/recipe-index/')
+        BellyFullScraper('https://bellyfull.net/recipe-index/'),
+        FeastingAtHomeScraper("https://www.feastingathome.com/recipes/"),
+
     ]
     fieldname = ['recipe_name','ingredients','url','unit']
     filename = 'recipes.csv'

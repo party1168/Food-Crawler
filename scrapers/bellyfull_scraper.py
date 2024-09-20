@@ -59,38 +59,41 @@ class BellyFullScraper(BaseScraper):
             return None
         soup = parse_html(response_text)
         ingredients = []
-        units = []
+        units = set()
         recipe_title = soup.find('h1',class_="entry-title").text.strip().strip("\"")
-        ingredients_container = soup.find('div',class_="wprm-recipe-ingredients-container")
-        if not ingredients_container:
-            return None
-        ingredients_groups = ingredients_container.find_all('div',class_="wprm-recipe-ingredient-group")
-        for ingredients_group in ingredients_groups:
-            lis = ingredients_group.find_all('li',class_="wprm-recipe-ingredient")
-            for li in lis:
-                ingredient_amount_item = li.find('span',class_="wprm-recipe-ingredient-amount")
-                if ingredient_amount_item:
-                    ingredient_amount = ingredient_amount_item.text.strip()
-                else:
-                    ingredient_amount =""
-                ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
-                if ingredient_unit_item:
-                    ingredient_unit = ingredient_unit_item.text.strip()
-                    units.append(ingredient_unit)
-                else:
-                    ingredient_unit = ""
-                ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
-                ingredient_text = ingredient_amount + ingredient_unit + ingredient_name
-                ingredient_text = ingredient_text.strip()
-                pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
-                if pass_ingredient:
-                    ingredients.append(pass_ingredient)
+        try:
+            ingredients_container = soup.find('div',class_="wprm-recipe-ingredients-container")
+            if not ingredients_container:
+                return None
+            ingredients_groups = ingredients_container.find_all('div',class_="wprm-recipe-ingredient-group")
+            for ingredients_group in ingredients_groups:
+                lis = ingredients_group.find_all('li',class_="wprm-recipe-ingredient")
+                for li in lis:
+                    ingredient_amount_item = li.find('span',class_="wprm-recipe-ingredient-amount")
+                    if ingredient_amount_item:
+                        ingredient_amount = ingredient_amount_item.text.strip()
+                    else:
+                        ingredient_amount =""
+                    ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
+                    if ingredient_unit_item:
+                        ingredient_unit = ingredient_unit_item.text.strip()
+                        units.add(ingredient_unit)
+                    else:
+                        ingredient_unit = ""
+                    ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
+                    ingredient_text = ingredient_amount + ingredient_unit + ingredient_name
+                    ingredient_text = ingredient_text.strip()
+                    pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
+                    if pass_ingredient:
+                        ingredients.append(pass_ingredient)
+        except Exception as e:
+            print(recipe_url)
         if ingredients:
             return {
                 'recipe_name':recipe_title,
                 'ingredients':ingredients,
                 'url':recipe_url,
-                'unit':units
+                'unit':list(units)
             }
     def scrape_all_recipes(self):
         return super().scrape_all_recipes()

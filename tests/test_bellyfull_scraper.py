@@ -27,6 +27,7 @@ def test_scrape_all_recipes(scraper):
         for ingredient in recipe['ingredients']:
             print(f"  - {ingredient}")
         print("-" * 30)    
+    print(f"Total recipe: {len(recipes)}")
         
 def main():
     scraper = BellyFullScraper('https://bellyfull.net/recipe-index/')
