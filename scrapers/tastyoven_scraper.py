@@ -87,7 +87,7 @@ class TastyOvenScraper(BaseScraper):
         title = title.text.strip() if title else "標題未找到"
 
         ingredients = []
-        units = []
+        units = set()
         ingredient_sections = soup.find_all('div',class_='wprm-recipe-ingredient-group') 
         if not ingredient_sections:
             return None 
@@ -103,7 +103,7 @@ class TastyOvenScraper(BaseScraper):
                 ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
                 if ingredient_unit_item:
                     ingredient_unit = ingredient_unit_item.text.strip()
-                    units.append(ingredient_unit)
+                    units.add(ingredient_unit)
                 else:
                     ingredient_unit = ""
                 ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
@@ -117,7 +117,7 @@ class TastyOvenScraper(BaseScraper):
             'recipe_name': title,
             'ingredients': ingredients,
             'url': recipe_url,
-            'unit':units
+            'unit':list(units)
             }
 
     def scrape_all_recipes(self):

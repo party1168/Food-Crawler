@@ -71,7 +71,7 @@ class TheCookingCollectiveScraper(BaseScraper):
         soup = parse_html(response_text)
         recipe_title = soup.find("h1",class_="entry-title").text.strip().strip("\"")
         ingredients = []
-        units =[]
+        units =set()
         ingredients_containers = soup.find('div',class_="wprm-recipe-ingredient-group")
         for ingredients_container in ingredients_containers:
             lis = ingredients_container.find_all('li',class_="wprm-recipe-ingredient")
@@ -84,7 +84,7 @@ class TheCookingCollectiveScraper(BaseScraper):
                 ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
                 if ingredient_unit_item:
                     ingredient_unit = ingredient_unit_item.text.strip()
-                    units.append(ingredient_unit)
+                    units.add(ingredient_unit)
                 else:
                     ingredient_unit = ""
                 ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
@@ -98,7 +98,7 @@ class TheCookingCollectiveScraper(BaseScraper):
                 'recipe_name':recipe_title,
                 'ingredients':ingredients,
                 'url':recipe_url,
-                'unit':units
+                'unit':list(units)
             }
         
     def scrape_all_recipes(self):

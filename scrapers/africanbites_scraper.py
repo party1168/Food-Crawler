@@ -95,7 +95,7 @@ class AfricanBitesScraper(BaseScraper):
                 'recipe_name':recipe_title,
                 'ingredients':ingredients,
                 'url':recipe_url,
-                'unit':""
+                'unit':[]
             }
 
     def scrape_all_recipes(self):
