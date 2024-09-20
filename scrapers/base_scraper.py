@@ -3,6 +3,9 @@ from tqdm import tqdm
 class BaseScraper(ABC):
     def __init__(self,base_url):
         self.base_url = base_url
+        self.ingredient_keywords = ['cheese', 'sauce', 'dough', 'meat', 'vegetable', 'fruit', 'spice', 'herb', 'oil', 'flour', 'sugar', 'salt']
+        self.non_ingredient_keywords = ['Time-saving', 'oven', 'box', 'bag', 'machine', 'air fryer', 'basket', 'recipe', 'brush', 'assemble', 'remove', 'change', 'use']
+
 
     #用來獲取食譜類別的抽象方法
     @abstractmethod

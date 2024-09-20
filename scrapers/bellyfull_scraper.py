@@ -59,7 +59,8 @@ class BellyFullScraper(BaseScraper):
             return None
         soup = parse_html(response_text)
         ingredients = []
-        recipe_title = soup.find('h1',class_="entry-title").text.strip()
+        units = []
+        recipe_title = soup.find('h1',class_="entry-title").text.strip().strip("\"")
         ingredients_container = soup.find('div',class_="wprm-recipe-ingredients-container")
         if not ingredients_container:
             return None
@@ -75,6 +76,7 @@ class BellyFullScraper(BaseScraper):
                 ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
                 if ingredient_unit_item:
                     ingredient_unit = ingredient_unit_item.text.strip()
+                    units.append(ingredient_unit)
                 else:
                     ingredient_unit = ""
                 ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
@@ -87,7 +89,8 @@ class BellyFullScraper(BaseScraper):
             return {
                 'recipe_name':recipe_title,
                 'ingredients':ingredients,
-                'url':recipe_url
+                'url':recipe_url,
+                'unit':units
             }
     def scrape_all_recipes(self):
         return super().scrape_all_recipes()

@@ -72,7 +72,7 @@ class AfricanBitesScraper(BaseScraper):
         if not response_text:
             return None
         soup = parse_html(response_text)
-        recipe_title = soup.find('h1',class_="entry-title").text.strip()
+        recipe_title = soup.find('h1',class_="entry-title").text.strip().strip("\"")
         ingredients = []
         ingredient_container = soup.find('ol',class_="wp-block-list")
         if not ingredient_container:
@@ -94,7 +94,8 @@ class AfricanBitesScraper(BaseScraper):
             return {
                 'recipe_name':recipe_title,
                 'ingredients':ingredients,
-                'url':recipe_url
+                'url':recipe_url,
+                'unit':""
             }
 
     def scrape_all_recipes(self):

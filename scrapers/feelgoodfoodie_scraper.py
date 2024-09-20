@@ -45,8 +45,9 @@ class FeelGoodFoodieScraper(BaseScraper):
         if not response_text:
             return None
         soup = parse_html(response_text)
-        recipe_title = soup.find('h1',class_="entry-title").text.strip()
+        recipe_title = soup.find('h1',class_="entry-title").text.strip().strip("\"")
         ingredients = []
+        units = []
         ingredients_container = soup.find('div',class_="wprm-recipe-ingredients-container")
         ingredients_items_containers = ingredients_container.find_all('ul',class_="wprm-recipe-ingredients")
         for ingredients_items_container in ingredients_items_containers:
@@ -56,6 +57,8 @@ class FeelGoodFoodieScraper(BaseScraper):
                 ingredient_amount = ingredient_amount_item.text.strip() if ingredient_amount_item else ""
                 ingredient_unit_item = ingredient_item.find('span',class_="wprm-recipe-ingredient-unit")
                 ingredient_unit = ingredient_unit_item.text.strip() if ingredient_unit_item else ""
+                if ingredient_unit:
+                    units.append(ingredient_unit)
                 ingredient_name_item = ingredient_item.find('span',class_="wprm-recipe-ingredient-name")
                 ingredient_name_href = ingredient_name_item.find('a')
                 ingredient_name = ingredient_name_href.text.strip() if ingredient_name_href else ingredient_item.text.strip()
@@ -67,7 +70,8 @@ class FeelGoodFoodieScraper(BaseScraper):
             return {
                 'recipe_name': recipe_title,
                 'ingredients':ingredients,
-                'url':recipe_url
+                'url':recipe_url,
+                'unit':units
             }
     def scrape_all_recipes(self):
         all_recipes = []
