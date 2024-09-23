@@ -74,19 +74,24 @@ class AfricanBitesScraper(BaseScraper):
         soup = parse_html(response_text)
         recipe_title = soup.find('h1',class_="entry-title").text.strip().strip("\"")
         ingredients = []
-        ingredient_container = soup.find('ol',class_="wp-block-list")
-        if not ingredient_container:
-            return []
-        ingredient_items = ingredient_container.find_all('li')
-        for ingredient_item in ingredient_items:
-            ingredient_text = ""
-            strong = ingredient_item.find('strong')
-            if strong:
-                ingredient_text = strong.text.strip()
-
-            mark = ingredient_item.find('mark',class_="has-orange-color")
-            if mark:
-                ingredient_text = mark.text.strip()
+        units = set()
+        ingredient_container = soup.find('div',class_='wprm-recipe-ingredient-group')
+        lis = ingredient_container.find_all('li',class_="wprm-recipe-ingredient")
+        for li in lis:
+            ingredient_amount_item = li.find('span',class_="wprm-recipe-ingredient-amount")
+            if ingredient_amount_item:
+               ingredient_amount = ingredient_amount_item.text.strip()
+            else:
+                ingredient_amount =""
+            ingredient_unit_item = li.find('span',class_="wprm-reicpe-ingredient-unit")
+            if ingredient_unit_item:
+                ingredient_unit = ingredient_unit_item.text.strip()
+                units.add(ingredient_unit)
+            else:
+                ingredient_unit = ""
+            ingredient_name = li.find('span',class_="wprm-recipe-ingredient-name").text.strip()
+            ingredient_text = ingredient_amount + ingredient_unit + ingredient_name
+            ingredient_text = ingredient_text.strip()
             pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
             if pass_ingredient:
                 ingredients.append(pass_ingredient)

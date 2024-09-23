@@ -72,7 +72,7 @@ class TheCookingCollectiveScraper(BaseScraper):
         recipe_title = soup.find("h1",class_="entry-title").text.strip().strip("\"")
         ingredients = []
         units =set()
-        ingredients_containers = soup.find('div',class_="wprm-recipe-ingredient-group")
+        ingredients_containers = soup.find_all('div',class_="wprm-recipe-ingredient-group")
         for ingredients_container in ingredients_containers:
             lis = ingredients_container.find_all('li',class_="wprm-recipe-ingredient")
             for li in lis:
