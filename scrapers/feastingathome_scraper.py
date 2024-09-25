@@ -71,7 +71,7 @@ class FeastingAtHomeScraper(BaseScraper):
                     units.add(ingredient_unit)  # 添加到單位集合
                 # 提取食材名稱
                 ingredient_name = item.get_text(strip=True)
-                ingredient_text = ingredient_amount + ingredient_unit + ingredient_name
+                ingredient_text = ingredient_name
                 pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
                 if pass_ingredient:
                     ingredients.append(pass_ingredient)

@@ -76,6 +76,8 @@ class AfricanBitesScraper(BaseScraper):
         ingredients = []
         units = set()
         ingredient_container = soup.find('div',class_='wprm-recipe-ingredient-group')
+        if not ingredient_container:
+            return None
         lis = ingredient_container.find_all('li',class_="wprm-recipe-ingredient")
         for li in lis:
             ingredient_amount_item = li.find('span',class_="wprm-recipe-ingredient-amount")

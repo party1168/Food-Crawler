@@ -54,14 +54,21 @@ class FeelGoodFoodieScraper(BaseScraper):
             ingredient_items = ingredients_items_container.find_all('li',class_="wprm-recipe-ingredient")
             for ingredient_item in ingredient_items:
                 ingredient_amount_item = ingredient_item.find('span',class_="wprm-recipe-ingredient-amount")
-                ingredient_amount = ingredient_amount_item.text.strip() if ingredient_amount_item else ""
+                if ingredient_amount_item:
+                    ingredient_amount = ingredient_amount_item.text.strip()
+                else:
+                    ingredient_amount = ""
                 ingredient_unit_item = ingredient_item.find('span',class_="wprm-recipe-ingredient-unit")
-                ingredient_unit = ingredient_unit_item.text.strip() if ingredient_unit_item else ""
-                if ingredient_unit:
+                if ingredient_unit_item:
+                    ingredient_unit = ingredient_unit_item.text.strip()
                     units.add(ingredient_unit)
+                else:
+                    ingredient_unit = ""
                 ingredient_name_item = ingredient_item.find('span',class_="wprm-recipe-ingredient-name")
-                ingredient_name_href = ingredient_name_item.find('a')
-                ingredient_name = ingredient_name_href.text.strip() if ingredient_name_href else ingredient_item.text.strip()
+                if ingredient_name_item:
+                    ingredient_name = ingredient_name_item.text.strip()
+                else:
+                    ingredient_name = ""
                 ingredient_text = ingredient_amount + ingredient_unit + ingredient_name
                 pass_ingredient = clean_and_validate_ingredient(ingredient_text,self.ingredient_keywords,self.non_ingredient_keywords)
                 if pass_ingredient:
