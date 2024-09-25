@@ -35,18 +35,15 @@ def main():
     #         all_recipes.extend(recipes)
     #     except Exception as e:
     #         print(f"{scraper.__class__.__name__} 產生了一個異常: {e}")
-    with tqdm(total=len(scrapers), desc="總體爬取進度", unit="網站"):
-        # 使用 ThreadPoolExecutor 進行並發爬取
-        with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers)) as executor:
-            # 提交所有爬取任務
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers)) as executor:
             future_to_scraper = {executor.submit(scrape_website, scraper): scraper for scraper in scrapers}
             
-            # 等待所有任務完成並處理結果
-            for future in concurrent.futures.as_completed(future_to_scraper):
+            for future in tqdm(concurrent.futures.as_completed(future_to_scraper), total=len(scrapers), desc="總體爬取進度",unit="website"):
                 scraper = future_to_scraper[future]
                 try:
                     recipes = future.result()
                     all_recipes.extend(recipes)
+                    print(f"{scraper.__class__.__name__} 完成, 獲取到 {len(recipes)} 個食譜")
                 except Exception as e:
                     print(f"{scraper.__class__.__name__} 產生了一個異常: {e}")
         # 保存結果

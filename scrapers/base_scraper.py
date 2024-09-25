@@ -28,7 +28,7 @@ class BaseScraper(ABC):
     def scrape_all_recipes(self):
         all_recipes = []
         categories = self.get_recipe_categories()
-        for category in tqdm(categories,desc=f"{self.__class__.__name__}食譜種類進度",unit="category"):
+        for category in categories:
             recipes = self.get_recipe_names(category['url'])
             for recipe in recipes:
                 details = self.get_recipe_detail(recipe['url'])

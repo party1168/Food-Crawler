@@ -90,7 +90,7 @@ class FeastingAtHomeScraper(BaseScraper):
     def scrape_all_recipes(self):
         all_recipes = []
         recipes = self.get_recipe_names()
-        for recipe in tqdm(recipes,desc=f"{self.__class__.__name__}食譜種類進度",unit="recipes"):
+        for recipe in recipes:
             details = self.get_recipe_detail(recipe['url'])
             if details and details['ingredients']:
                 all_recipes.append(details)
